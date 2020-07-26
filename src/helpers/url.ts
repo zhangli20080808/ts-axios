@@ -1,4 +1,4 @@
-import { isDate, isObject } from './util'
+import { isDate, isPlainObject } from './util'
 
 /*
 *
@@ -19,12 +19,12 @@ import { isDate, isObject } from './util'
 function encode(val: string): string {
   return encodeURIComponent(val)
     .replace(/%40/g, '@')
-    .replace(/%3A/ig, ':')
+    .replace(/%3A/gi, ':')
     .replace(/%24/g, '$')
-    .replace(/%2C/ig, ',')
-    .replace(/%20/ig, '+')
-    .replace(/%5B/ig, '[')
-    .replace(/%5D/ig, ']')
+    .replace(/%2C/gi, ',')
+    .replace(/%20/gi, '+')
+    .replace(/%5B/gi, '[')
+    .replace(/%5D/gi, ']')
 }
 
 export function buildUrl(url: string, params?: any): string {
@@ -34,9 +34,10 @@ export function buildUrl(url: string, params?: any): string {
 
   const parts: string[] = []
 
-  Object.keys(params).forEach((key) => {
+  // forEach return 是跳不出的 会跳到下一次循环
+  Object.keys(params).forEach(key => {
     const val = params[key]
-    if (val === null && val === undefined) {
+    if (val === null && typeof val === 'undefined') {
       return
     }
     let values = []
@@ -50,18 +51,18 @@ export function buildUrl(url: string, params?: any): string {
     values.forEach(val => {
       if (isDate(val)) {
         val = val.toISOString()
-      } else {
+      } else if (isPlainObject(val)) {
         val = JSON.stringify(val)
       }
       parts.push(`${encode(key)}=${encode(val)}`)
     })
   })
-//  再把我们的 kv 拆成 & 连接的形式  注意 hash后面的东西我们也要忽略掉 如果没有?我们拼一下
+  //  再把我们的 kv 拆成 & 连接的形式  注意 hash后面的东西我们也要忽略掉 如果没有?我们拼一下
   let serializedParams = parts.join('&')
   if (serializedParams) {
     //  是否有hash
     const markIndex = url.indexOf('#')
-    if (markIndex === -1) {
+    if (markIndex !== -1) {
       url = url.slice(0, markIndex)
     }
     url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams
