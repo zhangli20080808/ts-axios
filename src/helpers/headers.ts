@@ -1,10 +1,5 @@
 import { isPlainObject } from './util'
 
-/*
- * application/x-www-form-urlencoded代表参数以键值对传递给后台
- * application/json代表参数以json字符串传递给后台
- * */
-
 function normalizeHeaderName(headers: any, normalizedName: string): void {
   if (!headers) {
     return

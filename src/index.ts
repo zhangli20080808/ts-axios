@@ -1,19 +1,14 @@
-// Import here Polyfills if needed. Recommended core-js (npm i -D core-js)
-// import "core-js/fn/array.find"
-// ...
-/*
- * bindUrl的实现
- * */
-import { buildUrl } from './helpers/url'
-import { AxiosRequestConfig } from './types'
-import { transformRequest } from './helpers/data'
-import { processHeaders } from './helpers/headers'
+import { AxiosRequestConfig, AxiosPromise, AxiosResponse } from './types'
 import xhr from './xhr'
+import { buildURL } from './helpers/url'
+import { transformRequest, transformResponse } from './helpers/data'
+import { processHeaders } from './helpers/headers'
 
-function axios(config: AxiosRequestConfig): void {
-  /*url参数逻辑处理*/
+function axios(config: AxiosRequestConfig): AxiosPromise {
   processConfig(config)
-  xhr(config)
+  return xhr(config).then(res => {
+    return transformResponseData(res)
+  })
 }
 
 function processConfig(config: AxiosRequestConfig): void {
@@ -24,16 +19,21 @@ function processConfig(config: AxiosRequestConfig): void {
 
 function transformURL(config: AxiosRequestConfig): string {
   const { url, params } = config
-  return buildUrl(url, params)
+  return buildURL(url, params)
 }
 
 function transformRequestData(config: AxiosRequestConfig): any {
   return transformRequest(config.data)
 }
 
-function transformHeaders(config: AxiosRequestConfig): any {
+function transformHeaders(config: AxiosRequestConfig) {
   const { headers = {}, data } = config
-  processHeaders(headers, data)
+  return processHeaders(headers, data)
+}
+
+function transformResponseData(res: AxiosResponse): AxiosResponse {
+  res.data = transformResponse(res.data)
+  return res
 }
 
 export default axios
