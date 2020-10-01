@@ -2,13 +2,18 @@ import { AxiosRequestConfig, AxiosPromise, AxiosResponse } from './types'
 import { parseHeaders } from './helpers/headers'
 
 export default function xhr(config: AxiosRequestConfig): AxiosPromise {
-  return new Promise(resolve => {
-    const { data = null, url, method = 'get', headers, responseType } = config
+  return new Promise((resolve, reject) => {
+    const { data = null, url, method = 'get', headers, responseType, timeout } = config
 
     const request = new XMLHttpRequest()
 
     if (responseType) {
       request.responseType = responseType
+    }
+
+    if (timeout) {
+      // 默认是0  不超时 ms
+      request.timeout = timeout
     }
 
     request.open(method.toUpperCase(), url, true)
@@ -17,7 +22,12 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
       if (request.readyState !== 4) {
         return
       }
+      // 请求返回状态码非200  网络错误和超时 status 都是 0
+      if (request.status === 0) {
+        return
+      }
 
+      // getAllResponseHeaders 获取到的headers 是长字符串
       const responseHeaders = parseHeaders(request.getAllResponseHeaders())
       const responseData =
         responseType && responseType !== 'text' ? request.response : request.responseText
@@ -29,7 +39,16 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
         config,
         request
       }
-      resolve(response)
+      handleResponse(response)
+    }
+
+    // 处理网络错误
+    request.onerror = function handleError() {
+      reject(new Error('Network Error'))
+    }
+    // 处理超时
+    request.ontimeout = function handleTime() {
+      reject(new Error(`Timeout of ${timeout} ms exceeded`))
     }
 
     Object.keys(headers).forEach(name => {
@@ -41,5 +60,13 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
     })
 
     request.send(data)
+
+    function handleResponse(response: AxiosResponse): void {
+      if (response.status >= 200 && response.status < 300) {
+        resolve(response)
+      } else {
+        reject(new Error(`Request fail with status code ${response.status}`))
+      }
+    }
   })
 }

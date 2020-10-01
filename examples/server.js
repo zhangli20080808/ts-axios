@@ -27,6 +27,8 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use(router)
 
+registerErrorRouter()
+
 router.get('/simple/get', function(req, res) {
   res.json({
     msg: `hello world`
@@ -55,6 +57,28 @@ router.post('/base/buffer', function(req, res) {
 })
 
 app.use(router)
+
+function registerErrorRouter () {
+  router.get('/error/get', function(req, res) {
+    if (Math.random() > 0.5) {
+      res.json({
+        msg: `hello world`
+      })
+    } else {
+      res.status(500)
+      res.end()
+    }
+  })
+
+  router.get('/error/timeout', function(req, res) {
+    setTimeout(() => {
+      res.json({
+        msg: `hello world`
+      })
+    }, 3000)
+  })
+}
+
 
 const port = process.env.PORT || 8090
 module.exports = app.listen(port, () => {

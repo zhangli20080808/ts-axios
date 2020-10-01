@@ -24,6 +24,9 @@ export function processHeaders(headers: any, data: any): any {
 }
 
 export function parseHeaders(headers: string): any {
+  // 因为我们不能确定对象的数据结构 先创建一个空的对象
+  // Object.create(null) 返回的对象类型是 any 的。直接用 {}，那么 parsed[key] = val 是会报错的 #2
+  // {} 类型不是 any，也没有索签名
   let parsed = Object.create(null)
   if (!headers) {
     return parsed
@@ -33,7 +36,7 @@ export function parseHeaders(headers: string): any {
     let [key, val] = line.split(':')
     key = key.trim().toLowerCase()
     if (!key) {
-      return
+      return // 跳到下次循环
     }
     if (val) {
       val = val.trim()
