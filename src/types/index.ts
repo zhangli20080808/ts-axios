@@ -48,5 +48,6 @@ export interface AxiosError extends Error {
   code?: string | null
   request?: any
   response?: AxiosResponse
+  // 为了让 JS 调用方判断 error 的类型，并和 JS 版本的 axios API 接口保持一致
   isAxiosError: boolean
 }
