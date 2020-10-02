@@ -28,8 +28,8 @@ export interface AxiosRequestConfig {
   timeout?: number
 }
 
-export interface AxiosResponse {
-  data: any
+export interface AxiosResponse<T = any> {
+  data: T
   status: number
   statusText: string
   headers: any
@@ -43,7 +43,7 @@ export interface AxiosResponse {
  * 这个是 Promise 内部的实现机制。
  * 所以 Promise<AxiosResponse> 就表示 resolve 函数的参数就是 AxiosResponse 类型
  * */
-export interface AxiosPromise extends Promise<AxiosResponse> {}
+export interface AxiosPromise<T = any> extends Promise<AxiosResponse<T>> {}
 
 // 增强错误信息
 export interface AxiosError extends Error {
@@ -56,27 +56,34 @@ export interface AxiosError extends Error {
 }
 
 export interface Axios {
-  request(config: AxiosRequestConfig): AxiosPromise
+  // defaults: AxiosRequestConfig
+  // interceptors: {
+  //   request: AxiosInterceptorManager<AxiosRequestConfig>
+  //   response: AxiosInterceptorManager<AxiosResponse>
+  // }
+  // 我们允许请求的时候 传入一个具体的类型
 
-  get(url: string, config?: AxiosRequestConfig): AxiosPromise
+  request<T = any>(config: AxiosRequestConfig): AxiosPromise<T>
 
-  delete(url: string, config?: AxiosRequestConfig): AxiosPromise
+  get<T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  head(url: string, config?: AxiosRequestConfig): AxiosPromise
+  delete<T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  options(url: string, config?: AxiosRequestConfig): AxiosPromise
+  head<T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  post(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise
+  options<T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  put(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise
+  post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  patch(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise
+  put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise<T>
+
+  patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise<T>
 
   getUri(config?: AxiosRequestConfig): string
 }
 
 export interface AxiosInstance extends Axios {
-  (config: AxiosRequestConfig): AxiosPromise
+  <T = any>(config: AxiosRequestConfig): AxiosPromise<T>
 
-  (url: string, config: AxiosRequestConfig): AxiosPromise
+  <T = any>(url: string, config: AxiosRequestConfig): AxiosPromise<T>
 }
