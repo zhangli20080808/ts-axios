@@ -57,10 +57,11 @@ export interface AxiosError extends Error {
 
 export interface Axios {
   // defaults: AxiosRequestConfig
-  // interceptors: {
-  //   request: AxiosInterceptorManager<AxiosRequestConfig>
-  //   response: AxiosInterceptorManager<AxiosResponse>
-  // }
+  interceptors: {
+    request: AxiosInterceptorManager<AxiosRequestConfig>
+    response: AxiosInterceptorManager<AxiosResponse>
+  }
+
   // 我们允许请求的时候 传入一个具体的类型
 
   request<T = any>(config: AxiosRequestConfig): AxiosPromise<T>

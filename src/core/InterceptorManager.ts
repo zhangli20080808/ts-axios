@@ -19,7 +19,7 @@ export default class InterceptorManager<T> {
       resolved,
       rejected
     })
-    return this.interceptors.length
+    return this.interceptors.length - 1
   }
 
   eject(id: number): void {
