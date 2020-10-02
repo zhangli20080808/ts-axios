@@ -2,7 +2,16 @@ import { AxiosRequestConfig, AxiosPromise, Method } from '../types'
 import dispatchRequest from './dispatchRequest'
 
 export default class Axiso {
-  request(config: AxiosRequestConfig): AxiosPromise {
+  // 支持url和config 需要实现函数 重载 这个地方就不能对url做单一类型指定 我们需要在运行的时候去哦判断
+  request(url: any, config?: any): AxiosPromise {
+    if (typeof url === 'string') {
+      if (!config) {
+        config = {}
+      }
+      config.url = url
+    } else {
+      config = url
+    }
     return dispatchRequest(config)
   }
 
