@@ -1,3 +1,6 @@
+/*
+params 是用于拼接 url 的，get 请求传参就是拼到 url 中，而 data 是放在 request body 中的，用于 post 请求
+* */
 export type Method =
   | 'get'
   | 'GET'
